@@ -29,7 +29,7 @@ backup_and_copy() {
 }
 
 printf "\n%s - Copying ${SKY_BLUE}HyprBrigade configs${RESET}...\n" "${NOTE}"
-for dir in hypr waybar wallust rofi kitty swaync wlogout btop cava fastfetch; do
+for dir in hypr waybar wallust rofi kitty swaync wlogout btop cava fastfetch quickshell; do
   backup_and_copy "$dir"
 done
 
