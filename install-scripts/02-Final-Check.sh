@@ -6,10 +6,10 @@
 packages=(
   cliphist
   kvantum
-  rofi-wayland
+  rofi
   imagemagick
   swaync
-  swww
+  awww
   wallust
   waybar
   wl-clipboard
