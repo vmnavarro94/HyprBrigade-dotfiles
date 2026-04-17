@@ -175,6 +175,7 @@ yay -S --needed --noconfirm sddm 2>&1 | tee -a "$LOG"
 
 # Install HyprBrigade SDDM theme
 sudo cp -r "$SCRIPT_DIR/sddm/hyprbrigade" /usr/share/sddm/themes/
+sudo chmod -R 755 /usr/share/sddm/themes/hyprbrigade
 sudo cp "$SCRIPT_DIR/sddm/sddm.conf" /etc/sddm.conf
 
 sudo systemctl enable sddm.service
