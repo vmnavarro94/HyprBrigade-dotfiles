@@ -6,7 +6,6 @@ configs/waybar/wallust/colors-waybar.css
 configs/rofi/wallust/colors-rofi.rasi
 
 # Machine-specific
-configs/hypr/monitors.conf
 configs/hypr/wallpaper_effects/.wallpaper_current
 configs/hypr/wallpaper_effects/.wallpaper_modified
 configs/rofi/.current_wallpaper
