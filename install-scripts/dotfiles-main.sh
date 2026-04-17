@@ -20,8 +20,9 @@ backup_and_copy() {
   local dst="$HOME/.config/$name"
   [ ! -d "$src" ] && return
   if [ -d "$dst" ]; then
-    printf "${NOTE} Backing up ${YELLOW}$name${RESET} -> $name.bak\n"
-    mv "$dst" "${dst}.bak"
+    local bak="${dst}.bak.$(date +%H%M%S)"
+    printf "${NOTE} Backing up ${YELLOW}$name${RESET} -> $(basename $bak)\n"
+    mv "$dst" "$bak"
   fi
   cp -r "$src" "$dst"
   printf "${OK} ${YELLOW}$name${RESET} config installed.\n"
