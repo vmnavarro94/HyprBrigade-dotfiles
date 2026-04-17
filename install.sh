@@ -133,6 +133,17 @@ app_pkgs=(
     qt6ct
     ripgrep
     fd
+    fzf
+)
+
+# Shell
+shell_pkgs=(
+    zsh
+    oh-my-zsh-git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    pokemon-colorscripts-git
+    lsd
 )
 
 # ── Install packages ───────────────────────────────────────────────────────────
@@ -156,6 +167,7 @@ install_pkg_group "Terminal & shell"   "${terminal_pkgs[@]}"
 install_pkg_group "Audio & media"      "${media_pkgs[@]}"
 install_pkg_group "Fonts"              "${font_pkgs[@]}"
 install_pkg_group "Apps & utilities"   "${app_pkgs[@]}"
+install_pkg_group "Shell"              "${shell_pkgs[@]}"
 
 # ── Optional: Bluetooth ────────────────────────────────────────────────────────
 echo ""
@@ -193,6 +205,23 @@ backup_and_copy() {
 for dir in hypr waybar wallust rofi kitty swaync wlogout btop cava fastfetch; do
     [ -d "$CONFIG_SRC/$dir" ] && backup_and_copy "$dir"
 done
+
+# ── Copy .zshrc ───────────────────────────────────────────────────────────────
+if [ -f "$SCRIPT_DIR/.zshrc" ]; then
+    if [ -f "$HOME/.zshrc" ]; then
+        printf "${NOTE} Backing up existing .zshrc -> .zshrc.bak\n"
+        cp "$HOME/.zshrc" "$HOME/.zshrc.bak"
+    fi
+    cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
+    printf "${OK} .zshrc installed.\n"
+fi
+
+# ── Set zsh as default shell ───────────────────────────────────────────────────
+if [[ "$SHELL" != "$(which zsh)" ]]; then
+    printf "\n${CAT} Setting zsh as default shell...\n"
+    chsh -s "$(which zsh)"
+    printf "${OK} zsh set as default shell.\n"
+fi
 
 # ── Copy wallpapers ────────────────────────────────────────────────────────────
 printf "\n${CAT} Copying wallpapers...\n"
