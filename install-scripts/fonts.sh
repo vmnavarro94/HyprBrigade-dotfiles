@@ -45,4 +45,8 @@ for PKG1 in "${fonts[@]}"; do
   install_package "$PKG1" "$LOG"
 done
 
+# Refresh font cache
+printf "${NOTE} Refreshing ${SKY_BLUE}font cache${RESET}...\n"
+fc-cache -fv >> "$LOG" 2>&1 && printf "${OK} Font cache refreshed.\n"
+
 printf "\n%.0s" {1..2}

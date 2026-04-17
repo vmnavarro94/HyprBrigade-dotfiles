@@ -47,10 +47,12 @@ fi
 # Install Oh My Zsh, plugins, and set zsh as default shell
 if command -v zsh >/dev/null; then
   printf "${NOTE} Installing ${SKY_BLUE}Oh My Zsh and plugins${RESET} ...\n"
-  if [ ! -d "$HOME/.oh-my-zsh" ]; then  
-    sh -c "$(curl -fsSL https://install.ohmyz.sh)" "" --unattended  	       
+  if [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    # Remove broken/partial install if directory exists but oh-my-zsh.sh is missing
+    [ -d "$HOME/.oh-my-zsh" ] && rm -rf "$HOME/.oh-my-zsh"
+    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://install.ohmyz.sh)" "" --unattended
   else
-    echo "${INFO} Directory .oh-my-zsh already exists. Skipping re-installation." 2>&1 | tee -a "$LOG"
+    echo "${INFO} Oh My Zsh already installed. Skipping." 2>&1 | tee -a "$LOG"
   fi
   
   # Check if the directories exist before cloning the repositories
