@@ -129,12 +129,18 @@ app_pkgs=(
     gvfs
     ffmpegthumbs
     viewnior
+    thunar
+    thunar-volman
+    thunar-archive-plugin
     qt5ct
     qt6ct
     qt6-multimedia
     ripgrep
     fd
     fzf
+    yad
+    bc
+    libnotify
 )
 
 # Shell
