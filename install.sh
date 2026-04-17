@@ -1,29 +1,54 @@
 #!/bin/bash
-# /* ---- 💫 https://github.com/vmnavarro94/HyprBrigade 💫 ---- */
-# HyprBrigade - Arch Linux Hyprland Install Script
+# 💫 https://github.com/vmnavarro94/HyprBrigade 💫 #
+# HyprBrigade - Arch Linux Install Script #
 
-# Check if running as root
+clear
+
+OK="$(tput setaf 2)[OK]$(tput sgr0)"
+ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
+NOTE="$(tput setaf 3)[NOTE]$(tput sgr0)"
+INFO="$(tput setaf 4)[INFO]$(tput sgr0)"
+WARN="$(tput setaf 1)[WARN]$(tput sgr0)"
+CAT="$(tput setaf 6)[ACTION]$(tput sgr0)"
+MAGENTA="$(tput setaf 5)"
+YELLOW="$(tput setaf 3)"
+GREEN="$(tput setaf 2)"
+SKY_BLUE="$(tput setaf 6)"
+RESET="$(tput sgr0)"
+
+[ ! -d Install-Logs ] && mkdir Install-Logs
+LOG="Install-Logs/install-$(date +%d-%H%M%S)_main.log"
+
+# Must not run as root
 if [[ $EUID -eq 0 ]]; then
-    echo "Do not run this script as root. Exiting."
-    exit 1
+  echo "${ERROR} Do not run as root. Exiting." | tee -a "$LOG"; exit 1
+fi
+
+# Check PulseAudio conflict
+if pacman -Qq 2>/dev/null | grep -qw '^pulseaudio$'; then
+  echo "${ERROR} PulseAudio detected. Uninstall it before running this script." | tee -a "$LOG"; exit 1
+fi
+
+# Ensure base-devel
+if ! pacman -Q base-devel &>/dev/null; then
+  sudo pacman -S --noconfirm base-devel || { echo "${ERROR} Failed to install base-devel. Exiting."; exit 1; }
+fi
+
+# Ensure whiptail
+if ! command -v whiptail &>/dev/null; then
+  sudo pacman -S --noconfirm libnewt
+fi
+
+# Ensure pciutils
+if ! pacman -Qs pciutils &>/dev/null; then
+  sudo pacman -S --noconfirm pciutils
 fi
 
 clear
 
-# Colors
-OK="$(tput setaf 2)[OK]$(tput sgr0)"
-ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
-NOTE="$(tput setaf 3)[NOTE]$(tput sgr0)"
-WARN="$(tput setaf 166)[WARN]$(tput sgr0)"
-CAT="$(tput setaf 6)[ACTION]$(tput sgr0)"
-RESET=$(tput sgr0)
-ORANGE=$(tput setaf 166)
-CYAN=$(tput setaf 6)
-
-LOG="hyprbrigade-install-$(date +%d-%H%M%S).log"
-
-display_banner() {
-    cat << "EOF"
+printf "\n"
+echo -e "\e[35m"
+cat << "EOF"
  _   _             ____       _                 _
 | | | |_   _ _ __ | __ ) _ __(_) __ _  __ _  __| | ___
 | |_| | | | | '_ \|  _ \| '__| |/ _` |/ _` |/ _` |/ _ \
@@ -31,245 +56,136 @@ display_banner() {
 |_| |_|\__, | .__/|____/|_|  |_|\__, |\__,_|\__,_|\___|
        |___/|_|                 |___/
 EOF
-    echo ""
-    printf "${CYAN}  https://github.com/vmnavarro94/HyprBrigade${RESET}\n\n"
-}
+echo -e "\e[0m"
+printf "\n"
 
-display_banner
+whiptail --title "HyprBrigade Install Script" \
+  --msgbox "Welcome to HyprBrigade!\n\nhttps://github.com/vmnavarro94/HyprBrigade-dotfiles\n\nATTENTION: Run a full system update and reboot first (highly recommended).\n\nNOTE: If installing on a VM, enable 3D acceleration or Hyprland may not start." \
+  15 80
 
-printf "${NOTE} This script will install HyprBrigade on Arch Linux.\n"
-printf "${WARN} Make sure you have a fresh Arch installation before proceeding.\n\n"
-sleep 2
-
-# ── Check for yay ─────────────────────────────────────────────────────────────
-if ! command -v yay &>/dev/null; then
-    printf "${NOTE} yay not found. Installing yay...\n"
-    sudo pacman -S --needed --noconfirm git base-devel
-    git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-    cd /tmp/yay-bin && makepkg -si --noconfirm
-    cd -
+if ! whiptail --title "Proceed?" --yesno "Ready to install HyprBrigade?" 7 50; then
+  echo "${INFO} Installation cancelled."; exit 0
 fi
 
-printf "${OK} yay is available.\n"
-
-# ── Package lists ──────────────────────────────────────────────────────────────
-
-# Hyprland ecosystem
-hypr_pkgs=(
-    hyprland
-    xdg-desktop-portal-hyprland
-    hyprlock
-    hypridle
-    hyprpolkitagent
-    polkit
-    polkit-qt6
-    hyprcursor
-)
-
-# Wayland utilities
-wayland_pkgs=(
-    waybar
-    awww
-    wlogout
-    swaync
-    rofi
-    swappy
-    grim
-    slurp
-    wl-clipboard
-    cliphist
-    nwg-look
-    nwg-displays
-)
-
-# Power management
-power_pkgs=(
-    upower
-    power-profiles-daemon
-    libsecret
-)
-
-# Terminal & shell
-terminal_pkgs=(
-    kitty
-    lsd
-    fastfetch
-    btop
-)
-
-# Audio & media
-media_pkgs=(
-    pamixer
-    playerctl
-    pavucontrol
-    mpv
-    cava
-)
-
-# Fonts
-font_pkgs=(
-    ttf-jetbrains-mono-nerd
-    otf-font-awesome
-    otf-font-awesome-4
-    ttf-droid
-    ttf-fantasque-sans-mono
-    noto-fonts
-    noto-fonts-emoji
-)
-
-# Apps & utilities
-app_pkgs=(
-    wallust
-    jq
-    curl
-    git
-    python-requests
-    brightnessctl
-    network-manager-applet
-    gvfs
-    ffmpegthumbs
-    viewnior
-    thunar
-    thunar-volman
-    thunar-archive-plugin
-    qt5ct
-    qt6ct
-    qt6-multimedia
-    ripgrep
-    fd
-    fzf
-    yad
-    bc
-    libnotify
-)
-
-# Shell
-shell_pkgs=(
-    zsh
-    oh-my-zsh-git
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    pokemon-colorscripts-git
-    lsd
-)
-
-# ── Install packages ───────────────────────────────────────────────────────────
-
-install_pkg_group() {
-    local group_name="$1"
-    shift
-    local pkgs=("$@")
-    printf "\n${CAT} Installing $group_name...\n"
-    if yay -S --needed --noconfirm "${pkgs[@]}" 2>&1 | tee -a "$LOG"; then
-        printf "${OK} $group_name installed.\n"
-    else
-        printf "${ERROR} Some packages in $group_name failed. Check $LOG.\n"
-    fi
-}
-
-install_pkg_group "Hyprland ecosystem" "${hypr_pkgs[@]}"
-install_pkg_group "Wayland utilities"  "${wayland_pkgs[@]}"
-install_pkg_group "Power management"   "${power_pkgs[@]}"
-install_pkg_group "Terminal & shell"   "${terminal_pkgs[@]}"
-install_pkg_group "Audio & media"      "${media_pkgs[@]}"
-install_pkg_group "Fonts"              "${font_pkgs[@]}"
-install_pkg_group "Apps & utilities"   "${app_pkgs[@]}"
-install_pkg_group "Shell"              "${shell_pkgs[@]}"
-
-# ── Display manager (SDDM) ─────────────────────────────────────────────────────
-printf "\n${CAT} Installing SDDM display manager...\n"
-yay -S --needed --noconfirm sddm 2>&1 | tee -a "$LOG"
-
-# Install HyprBrigade SDDM theme
-sudo cp -r "$SCRIPT_DIR/sddm/hyprbrigade" /usr/share/sddm/themes/
-sudo chmod -R 755 /usr/share/sddm/themes/hyprbrigade
-sudo cp "$SCRIPT_DIR/sddm/sddm.conf" /etc/sddm.conf
-
-sudo systemctl enable sddm.service
-printf "${OK} SDDM installed and enabled with HyprBrigade theme.\n"
-
-# ── Optional: Bluetooth ────────────────────────────────────────────────────────
-echo ""
-read -rp "${CAT} Install Bluetooth support? (bluez, blueman) [y/N]: " bluetooth
-if [[ "$bluetooth" =~ ^[Yy]$ ]]; then
-    install_pkg_group "Bluetooth" bluez bluez-utils blueman
-    sudo systemctl enable bluetooth.service
+# ── AUR helper ────────────────────────────────────────────────────────────────
+if ! command -v yay &>/dev/null && ! command -v paru &>/dev/null; then
+  aur_helper=$(whiptail --title "AUR Helper" --radiolist "Select an AUR helper:" 10 50 2 \
+    "yay" "yay (recommended)" ON \
+    "paru" "paru" OFF \
+    3>&1 1>&2 2>&3)
+  [ $? -ne 0 ] && exit 0
+  aur_helper=$(echo "$aur_helper" | tr -d '"')
+else
+  echo "${NOTE} AUR helper already installed."
 fi
 
-# ── Optional: NVIDIA ───────────────────────────────────────────────────────────
-echo ""
-read -rp "${CAT} Install NVIDIA drivers (nvidia-dkms + utils)? [y/N]: " nvidia
-if [[ "$nvidia" =~ ^[Yy]$ ]]; then
-    install_pkg_group "NVIDIA" nvidia-dkms nvidia-utils lib32-nvidia-utils \
-        libva-nvidia-driver linux-firmware-nvidia opencl-nvidia
+# ── NVIDIA detection ──────────────────────────────────────────────────────────
+nvidia_detected=false
+if lspci | grep -i "nvidia" &>/dev/null; then
+  nvidia_detected=true
+  whiptail --title "NVIDIA GPU Detected" \
+    --msgbox "NVIDIA GPU detected.\n\nThe script can install nvidia-dkms and configure it if you choose." 10 60
 fi
 
-# ── Copy configs ───────────────────────────────────────────────────────────────
-printf "\n${CAT} Copying HyprBrigade configs...\n"
+# ── Build options ─────────────────────────────────────────────────────────────
+options_command=(
+  whiptail --title "Select Options" --checklist \
+  "Choose what to install\n(SPACEBAR to select, TAB to switch)" 28 80 18
+)
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_SRC="$SCRIPT_DIR/configs"
+if [ "$nvidia_detected" == "true" ]; then
+  options_command+=(
+    "nvidia"  "Configure NVIDIA GPU?" "OFF"
+    "nouveau" "Blacklist Nouveau?" "OFF"
+  )
+fi
 
-backup_and_copy() {
-    local src="$CONFIG_SRC/$1"
-    local dst="$HOME/.config/$1"
-    if [ -d "$dst" ]; then
-        printf "${NOTE} Backing up existing $1 -> $1.bak\n"
-        mv "$dst" "${dst}.bak"
-    fi
-    cp -r "$src" "$dst"
-    printf "${OK} $1 config installed.\n"
-}
+if ! groups "$(whoami)" | grep -q '\binput\b'; then
+  options_command+=(
+    "input_group" "Add user to input group (Waybar keyboard-state)?" "OFF"
+  )
+fi
 
-for dir in hypr waybar wallust rofi kitty swaync wlogout btop cava fastfetch; do
-    [ -d "$CONFIG_SRC/$dir" ] && backup_and_copy "$dir"
+options_command+=(
+  "sddm"        "Install SDDM + HyprBrigade login theme?" "ON"
+  "bluetooth"   "Configure Bluetooth?" "OFF"
+  "thunar"      "Install Thunar file manager?" "ON"
+  "zsh"         "Install zsh + Oh-My-Zsh?" "ON"
+  "pokemon"     "Add Pokemon color scripts to terminal?" "ON"
+  "dots"        "Install HyprBrigade dotfiles (configs)?" "ON"
+)
+
+while true; do
+  selected_options=$("${options_command[@]}" 3>&1 1>&2 2>&3)
+  [ $? -ne 0 ] && { echo "${INFO} Cancelled."; exit 0; }
+  [ -z "$selected_options" ] && { whiptail --title "Warning" --msgbox "Select at least one option." 8 50; continue; }
+
+  selected_options=$(echo "$selected_options" | tr -d '"' | tr -s ' ')
+  IFS=' ' read -r -a options <<< "$selected_options"
+
+  confirm_msg="You selected:\n\n"
+  for opt in "${options[@]}"; do confirm_msg+=" • $opt\n"; done
+  confirm_msg+="\nProceed?"
+
+  if whiptail --title "Confirm" --yesno "$(printf "%s" "$confirm_msg")" 22 70; then
+    break
+  fi
 done
 
-# ── Copy .zshrc ───────────────────────────────────────────────────────────────
-if [ -f "$SCRIPT_DIR/.zshrc" ]; then
-    if [ -f "$HOME/.zshrc" ]; then
-        printf "${NOTE} Backing up existing .zshrc -> .zshrc.bak\n"
-        cp "$HOME/.zshrc" "$HOME/.zshrc.bak"
-    fi
-    cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc"
-    printf "${OK} .zshrc installed.\n"
-fi
+# ── Script runner ─────────────────────────────────────────────────────────────
+script_directory=install-scripts
 
-# ── Set zsh as default shell ───────────────────────────────────────────────────
-if [[ "$SHELL" != "$(which zsh)" ]]; then
-    printf "\n${CAT} Setting zsh as default shell...\n"
-    chsh -s "$(which zsh)"
-    printf "${OK} zsh set as default shell.\n"
-fi
+execute_script() {
+  local script="$script_directory/$1"
+  if [ -f "$script" ]; then
+    chmod +x "$script"
+    env "$script"
+  else
+    echo "${WARN} Script '$1' not found."
+  fi
+}
 
-# ── Copy wallpapers ────────────────────────────────────────────────────────────
-printf "\n${CAT} Copying wallpapers...\n"
-mkdir -p "$HOME/Pictures/wallpapers"
-cp -r "$SCRIPT_DIR/wallpapers/." "$HOME/Pictures/wallpapers/"
-printf "${OK} Wallpapers installed.\n"
+# ── Base installation ─────────────────────────────────────────────────────────
+execute_script "00-base.sh"
+execute_script "pacman.sh"
 
-# ── Enable services ────────────────────────────────────────────────────────────
-printf "\n${CAT} Enabling system services...\n"
-sudo systemctl enable power-profiles-daemon.service 2>/dev/null && \
-    printf "${OK} power-profiles-daemon enabled.\n"
-
-# ── Set initial wallpaper dir ──────────────────────────────────────────────────
-mkdir -p "$HOME/.config/hypr/wallpaper_effects"
-
-# ── Generate wallust colors from default wallpaper ─────────────────────────────
-printf "\n${CAT} Generating color scheme from wallpaper...\n"
-WALLPAPER="$HOME/Pictures/wallpapers/outer-wilds.webp"
-if [ -f "$WALLPAPER" ] && command -v wallust &>/dev/null; then
-    mkdir -p "$HOME/.config/hypr/wallust"
-    wallust run -s "$WALLPAPER"
-    printf "${OK} Color scheme generated.\n"
+if [ "$aur_helper" == "paru" ]; then
+  execute_script "paru.sh"
 else
-    printf "${WARN} Could not generate colors. Run 'wallust run <wallpaper>' manually after first boot.\n"
+  execute_script "yay.sh"
 fi
 
-# ── Done ───────────────────────────────────────────────────────────────────────
-echo ""
-printf "${OK} HyprBrigade installation complete!\n"
-printf "${NOTE} Log saved to: $LOG\n"
-printf "${NOTE} Reboot or log out and select Hyprland to get started.\n\n"
-printf "${CYAN}  https://github.com/vmnavarro94/HyprBrigade${RESET}\n\n"
+execute_script "01-hypr-pkgs.sh"
+execute_script "pipewire.sh"
+execute_script "fonts.sh"
+execute_script "hyprland.sh"
+
+# ── Optional components ───────────────────────────────────────────────────────
+for option in "${options[@]}"; do
+  case "$option" in
+    sddm)        execute_script "sddm.sh" ;;
+    nvidia)      execute_script "nvidia.sh" ;;
+    nouveau)     execute_script "nvidia_nouveau.sh" ;;
+    bluetooth)   execute_script "bluetooth.sh" ;;
+    input_group) execute_script "InputGroup.sh" ;;
+    thunar)      execute_script "thunar.sh" ;;
+    zsh)         execute_script "zsh.sh" ;;
+    pokemon)     execute_script "zsh_pokemon.sh" ;;
+    dots)        execute_script "dotfiles-main.sh" ;;
+    *)           echo "Unknown option: $option" ;;
+  esac
+done
+
+execute_script "02-Final-Check.sh"
+
+clear
+printf "\n${OK} HyprBrigade installation complete!\n"
+printf "${NOTE} Log files saved in: Install-Logs/\n"
+printf "\n${NOTE} If SDDM was not installed, start Hyprland by typing: ${SKY_BLUE}Hyprland${RESET}\n"
+printf "${NOTE} It is highly recommended to ${YELLOW}reboot${RESET} your system.\n\n"
+printf "${SKY_BLUE}  https://github.com/vmnavarro94/HyprBrigade-dotfiles${RESET}\n\n"
+
+read -rp "${CAT} Reboot now? [y/N]: " reboot_now
+if [[ "$reboot_now" =~ ^[Yy]$ ]]; then
+  systemctl reboot
+fi
