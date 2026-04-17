@@ -41,12 +41,17 @@ printf "${OK} Wallpapers installed.\n"
 # Generate wallust colors from default wallpaper
 printf "\n${NOTE} Generating ${SKY_BLUE}color scheme${RESET} from wallpaper...\n"
 WALLPAPER="$HOME/Pictures/wallpapers/outer-wilds.webp"
+mkdir -p "$HOME/.config/hypr/wallust"
 if [ -f "$WALLPAPER" ] && command -v wallust &>/dev/null; then
-  mkdir -p "$HOME/.config/hypr/wallust"
-  wallust run -s "$WALLPAPER"
-  printf "${OK} Color scheme generated.\n"
+  wallust run -s "$WALLPAPER" && printf "${OK} Color scheme generated.\n" || \
+    printf "${WARN} wallust run failed. Using default colors.\n"
 else
-  printf "${WARN} Could not generate colors. Run 'wallust run <wallpaper>' manually after first boot.\n"
+  printf "${WARN} Could not generate colors. Using defaults.\n"
+fi
+# Fallback: if wallust-hyprland.conf still doesn't exist, copy the default from repo
+if [ ! -f "$HOME/.config/hypr/wallust/wallust-hyprland.conf" ]; then
+  cp "$CONFIG_SRC/hypr/wallust/wallust-hyprland.conf" "$HOME/.config/hypr/wallust/" && \
+    printf "${OK} Default wallust colors installed as fallback.\n"
 fi
 
 # Enable power-profiles-daemon
