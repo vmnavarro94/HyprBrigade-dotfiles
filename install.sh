@@ -109,6 +109,7 @@ fi
 options_command+=(
   "sddm"        "Install SDDM + HyprBrigade login theme?" "ON"
   "bluetooth"   "Configure Bluetooth?" "OFF"
+  "gtk_themes"  "Install GTK Themes & Icons (Flat-Remix + Bibata)?" "ON"
   "thunar"      "Install Thunar file manager?" "ON"
   "zsh"         "Install zsh + Oh-My-Zsh?" "ON"
   "pokemon"     "Add Pokemon color scripts to terminal?" "ON"
@@ -168,6 +169,7 @@ for option in "${options[@]}"; do
     nouveau)     execute_script "nvidia_nouveau.sh" ;;
     bluetooth)   execute_script "bluetooth.sh" ;;
     input_group) execute_script "InputGroup.sh" ;;
+    gtk_themes)  execute_script "gtk_themes.sh" ;;
     thunar)      execute_script "thunar.sh" ;;
     zsh)         execute_script "zsh.sh" ;;
     pokemon)     execute_script "zsh_pokemon.sh" ;;
