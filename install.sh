@@ -248,6 +248,17 @@ sudo systemctl enable power-profiles-daemon.service 2>/dev/null && \
 # ── Set initial wallpaper dir ──────────────────────────────────────────────────
 mkdir -p "$HOME/.config/hypr/wallpaper_effects"
 
+# ── Generate wallust colors from default wallpaper ─────────────────────────────
+printf "\n${CAT} Generating color scheme from wallpaper...\n"
+WALLPAPER="$HOME/Pictures/wallpapers/outer-wilds.webp"
+if [ -f "$WALLPAPER" ] && command -v wallust &>/dev/null; then
+    mkdir -p "$HOME/.config/hypr/wallust"
+    wallust run -s "$WALLPAPER"
+    printf "${OK} Color scheme generated.\n"
+else
+    printf "${WARN} Could not generate colors. Run 'wallust run <wallpaper>' manually after first boot.\n"
+fi
+
 # ── Done ───────────────────────────────────────────────────────────────────────
 echo ""
 printf "${OK} HyprBrigade installation complete!\n"
