@@ -169,6 +169,12 @@ install_pkg_group "Fonts"              "${font_pkgs[@]}"
 install_pkg_group "Apps & utilities"   "${app_pkgs[@]}"
 install_pkg_group "Shell"              "${shell_pkgs[@]}"
 
+# ── Display manager (SDDM) ─────────────────────────────────────────────────────
+printf "\n${CAT} Installing SDDM display manager...\n"
+yay -S --needed --noconfirm sddm 2>&1 | tee -a "$LOG"
+sudo systemctl enable sddm.service
+printf "${OK} SDDM installed and enabled.\n"
+
 # ── Optional: Bluetooth ────────────────────────────────────────────────────────
 echo ""
 read -rp "${CAT} Install Bluetooth support? (bluez, blueman) [y/N]: " bluetooth
