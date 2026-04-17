@@ -1,8 +1,7 @@
 # Logs
 *.log
 
-# Generated wallust files (these get generated on first run)
-configs/hypr/wallust/wallust-hyprland.conf
+# Generated wallust files (these get regenerated on wallpaper change)
 configs/waybar/wallust/colors-waybar.css
 configs/rofi/wallust/colors-rofi.rasi
 
