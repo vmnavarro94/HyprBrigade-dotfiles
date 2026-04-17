@@ -35,13 +35,17 @@ done
 
 # Copy wallpapers
 printf "\n${NOTE} Copying ${SKY_BLUE}wallpapers${RESET}...\n"
-mkdir -p "$HOME/Pictures/wallpapers"
-cp -r "$PARENT_DIR/wallpapers/." "$HOME/Pictures/wallpapers/"
-printf "${OK} Wallpapers installed.\n"
+# Use xdg-user-dir so the path matches WallpaperSelect.sh on any locale
+xdg-user-dirs-update 2>/dev/null || true
+PICTURES_DIR="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"
+WALLPAPER_DIR="$PICTURES_DIR/wallpapers"
+mkdir -p "$WALLPAPER_DIR"
+cp -r "$PARENT_DIR/wallpapers/." "$WALLPAPER_DIR/"
+printf "${OK} Wallpapers installed to ${YELLOW}$WALLPAPER_DIR${RESET}.\n"
 
 # Generate wallust colors from default wallpaper
 printf "\n${NOTE} Generating ${SKY_BLUE}color scheme${RESET} from wallpaper...\n"
-WALLPAPER="$HOME/Pictures/wallpapers/outer-wilds.webp"
+WALLPAPER="$WALLPAPER_DIR/outer-wilds.webp"
 mkdir -p "$HOME/.config/hypr/wallust"
 if [ -f "$WALLPAPER" ] && command -v wallust &>/dev/null; then
   wallust run -s "$WALLPAPER" && printf "${OK} Color scheme generated.\n" || \
