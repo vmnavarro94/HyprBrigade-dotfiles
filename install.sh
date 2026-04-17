@@ -131,6 +131,7 @@ app_pkgs=(
     viewnior
     qt5ct
     qt6ct
+    qt6-multimedia
     ripgrep
     fd
     fzf
