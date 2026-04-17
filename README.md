@@ -21,7 +21,7 @@
 | Terminal | [Kitty](https://sw.kovidgoyal.net/kitty/) |
 | Launcher | [Rofi](https://github.com/davatorium/rofi) |
 | Notifications | [swaync](https://github.com/ErikReider/SwayNotificationCenter) |
-| Wallpaper | [swww](https://github.com/LGFae/swww) |
+| Wallpaper | [awww](https://github.com/heapbytes/awww) |
 | Color scheme | [wallust](https://codeberg.org/explosion-mental/wallust) |
 | Lock screen | [hyprlock](https://github.com/hyprwm/hyprlock) |
 | Idle daemon | [hypridle](https://github.com/hyprwm/hypridle) |
