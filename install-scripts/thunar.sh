@@ -47,4 +47,8 @@ for DIR1 in gtk-3.0 Thunar xfce4; do
   fi
 done
 
+# Set Thunar as default file manager
+xdg-mime default thunar.desktop inode/directory application/x-gnome-saved-search 2>/dev/null && \
+  printf "${OK} Thunar set as default file manager.\n" || true
+
 printf "\n%.0s" {1..2}

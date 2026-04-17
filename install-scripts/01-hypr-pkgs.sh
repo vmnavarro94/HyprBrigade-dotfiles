@@ -52,10 +52,13 @@ hypr_package_2=(
   mousepad
   mpv
   mpv-mpris
+  nvtop
   nwg-look
   nwg-displays
   pacman-contrib
+  power-profiles-daemon
   qalculate-gtk
+  unzip
   yt-dlp
 )
 

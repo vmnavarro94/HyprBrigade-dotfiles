@@ -107,13 +107,16 @@ if ! groups "$(whoami)" | grep -q '\binput\b'; then
 fi
 
 options_command+=(
-  "sddm"        "Install SDDM + HyprBrigade login theme?" "ON"
-  "bluetooth"   "Configure Bluetooth?" "OFF"
-  "gtk_themes"  "Install GTK Themes & Icons (Flat-Remix + Bibata)?" "ON"
-  "thunar"      "Install Thunar file manager?" "ON"
-  "zsh"         "Install zsh + Oh-My-Zsh?" "ON"
-  "pokemon"     "Add Pokemon color scripts to terminal?" "ON"
-  "dots"        "Install HyprBrigade dotfiles (configs)?" "ON"
+  "sddm"            "Install SDDM + HyprBrigade login theme?" "ON"
+  "bluetooth"       "Configure Bluetooth?" "OFF"
+  "gtk_themes"      "Install GTK Themes & Icons (Flat-Remix + Bibata)?" "ON"
+  "thunar"          "Install Thunar file manager?" "ON"
+  "zsh"             "Install zsh + Oh-My-Zsh?" "ON"
+  "pokemon"         "Add Pokemon color scripts to terminal?" "ON"
+  "battery_monitor" "Install battery low notification service?" "OFF"
+  "disk_monitor"    "Install disk space notification service?" "OFF"
+  "temp_monitor"    "Install CPU/GPU temperature alert service?" "OFF"
+  "dots"            "Install HyprBrigade dotfiles (configs)?" "ON"
 )
 
 while true; do
@@ -160,6 +163,7 @@ execute_script "01-hypr-pkgs.sh"
 execute_script "pipewire.sh"
 execute_script "fonts.sh"
 execute_script "hyprland.sh"
+execute_script "xdph.sh"
 
 # ── Optional components ───────────────────────────────────────────────────────
 for option in "${options[@]}"; do
@@ -169,11 +173,14 @@ for option in "${options[@]}"; do
     nouveau)     execute_script "nvidia_nouveau.sh" ;;
     bluetooth)   execute_script "bluetooth.sh" ;;
     input_group) execute_script "InputGroup.sh" ;;
-    gtk_themes)  execute_script "gtk_themes.sh" ;;
-    thunar)      execute_script "thunar.sh" ;;
-    zsh)         execute_script "zsh.sh" ;;
-    pokemon)     execute_script "zsh_pokemon.sh" ;;
-    dots)        execute_script "dotfiles-main.sh" ;;
+    gtk_themes)      execute_script "gtk_themes.sh" ;;
+    thunar)          execute_script "thunar.sh" ;;
+    zsh)             execute_script "zsh.sh" ;;
+    pokemon)         execute_script "zsh_pokemon.sh" ;;
+    battery_monitor) execute_script "battery-monitor.sh" ;;
+    disk_monitor)    execute_script "disk-monitor.sh" ;;
+    temp_monitor)    execute_script "temp-monitor.sh" ;;
+    dots)            execute_script "dotfiles-main.sh" ;;
     *)           echo "Unknown option: $option" ;;
   esac
 done
