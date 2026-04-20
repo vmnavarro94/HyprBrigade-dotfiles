@@ -34,13 +34,13 @@ GDK_BACKEND=$BACKEND yad \
 " D" "Application Launcher" "(rofi-wayland)" \
 " E" "Open File Manager" "(Thunar)" \
 " S" "Google Search using rofi" "(rofi)" \
-" T" "Global theme switcher" "(rofi)" \
+" SHIFT T" "Global theme switcher" "(rofi)" \
 " Q" "close active window" "(not kill)" \
 " Shift Q " "kills an active window" "(kill)" \
 " ALT mouse scroll up/down   " "Desktop Zoom" "Desktop Magnifier" \
 " Alt V" "Clipboard Manager" "(cliphist)" \
-" W" "Choose wallpaper" "(Wallpaper Menu)" \
-" Shift W" "Choose wallpaper effects" "(imagemagick + swww)" \
+" SHIFT W" "Choose wallpaper" "(Wallpaper Menu)" \
+" CTRL W" "Choose wallpaper effects" "(imagemagick + swww)" \
 "CTRL ALT W" "Random wallpaper" "(via swww)" \
 " CTRL ALT B" "Hide/UnHide Waybar" "waybar" \
 " CTRL B" "Choose waybar styles" "(waybar styles)" \
