@@ -1,49 +1,49 @@
- /* ---- 💫 https://github.com/vmnavarro94/HyprBrigade 💫 ---- */  
- /* wallust template - colors-rofi */
+ /* ---- 💫 https://github.com/vmnavarro94/HyprBrigade 💫 ---- */
+ /* Tokyo Night theme */
 
 * {
-active-background: {{color12}};
-active-foreground: {{foreground}};
-normal-background: {{background}};
-normal-foreground: {{foreground}};
-urgent-background: {{color13}};
-urgent-foreground: {{foreground}};
+active-background: #7aa2f7;
+active-foreground: #a9b1d6;
+normal-background: #1a1b26;
+normal-foreground: #a9b1d6;
+urgent-background: #bb9af7;
+urgent-foreground: #a9b1d6;
 
-alternate-active-background: {{color11}};
-alternate-active-foreground: {{foreground}};
-alternate-normal-background: {{background}};
-alternate-normal-foreground: {{foreground}};
-alternate-urgent-background: {{background}};
-alternate-urgent-foreground: {{foreground}};
+alternate-active-background: #e0af68;
+alternate-active-foreground: #a9b1d6;
+alternate-normal-background: #1a1b26;
+alternate-normal-foreground: #a9b1d6;
+alternate-urgent-background: #1a1b26;
+alternate-urgent-foreground: #a9b1d6;
 
-selected-active-background: {{color12}};
-selected-active-foreground: {{background}};
-selected-normal-background: {{color12}};
-selected-normal-foreground: {{background}};
-selected-urgent-background: {{color11}};
-selected-urgent-foreground: {{background}};
+selected-active-background: #7aa2f7;
+selected-active-foreground: #1a1b26;
+selected-normal-background: #7aa2f7;
+selected-normal-foreground: #1a1b26;
+selected-urgent-background: #e0af68;
+selected-urgent-foreground: #1a1b26;
 
-background-color: {{background}};
+background-color: #1a1b26;
 background: rgba(0,0,0,0.7);
-foreground: {{foreground}};
-border-color: {{color12}};
+foreground: #a9b1d6;
+border-color: #7aa2f7;
 
-color0: {{color0}};
-color1: {{color1}};
-color2: {{color2}};
-color3: {{color3}};
-color4: {{color4}};
-color5: {{color5}};
-color6: {{color6}};
-color7: {{color7}};
-color8: {{color8}};
-color9: {{color9}};
-color10: {{color10}};
-color11: {{color11}};
-color12: {{color12}};
-color13: {{color13}};
-color14: {{color14}};
-color15: {{color15}};
+color0: #414868;
+color1: #f7768e;
+color2: #73daca;
+color3: #e0af68;
+color4: #7aa2f7;
+color5: #bb9af7;
+color6: #7dcfff;
+color7: #c0caf5;
+color8: #414868;
+color9: #f7768e;
+color10: #73daca;
+color11: #e0af68;
+color12: #7aa2f7;
+color13: #bb9af7;
+color14: #7dcfff;
+color15: #c0caf5;
 
 
 }
