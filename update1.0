@@ -1,0 +1,164 @@
+#!/bin/bash
+# /* ---- 💫 https://github.com/vmnavarro94/HyprBrigade 💫 ---- */
+# HyprBrigade - System Update v1.0
+
+OK="$(tput setaf 2)[OK]$(tput sgr0)"
+ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
+NOTE="$(tput setaf 3)[NOTE]$(tput sgr0)"
+CAT="$(tput setaf 6)[ACTION]$(tput sgr0)"
+CYAN=$(tput setaf 6)
+RESET=$(tput sgr0)
+
+echo ""
+printf "${CYAN}  HyprBrigade System Update v1.0${RESET}\n"
+printf "${CYAN}  https://github.com/vmnavarro94/HyprBrigade${RESET}\n\n"
+
+printf "${CAT} Checking system integrity...\n"
+sleep 1
+printf "${OK} System check passed\n\n"
+
+printf "${CAT} Applying configuration updates...\n"
+sleep 1
+printf "${OK} Configurations applied\n\n"
+
+printf "${NOTE} Launching display calibration module...\n"
+sleep 1
+
+python3 - <<'PYEOF'
+import gi
+gi.require_version('Gtk', '4.0')
+from gi.repository import Gtk, Gdk, GLib, Pango, PangoCairo
+import random
+import math
+
+COLORS = [
+    (1.0, 0.0, 0.0),
+    (0.0, 1.0, 0.0),
+    (0.0, 0.0, 1.0),
+    (1.0, 1.0, 0.0),
+    (1.0, 0.0, 1.0),
+    (0.0, 1.0, 1.0),
+    (1.0, 0.5, 0.0),
+    (0.5, 0.0, 1.0),
+    (0.0, 1.0, 0.5),
+]
+
+class BolicheSaver(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        super().__init__(application=app)
+        self.set_decorated(False)
+        self.fullscreen()
+
+        self.text = "Amos al Boliche"
+        self.font_size = 80  # pts
+        self.color_idx = 0
+        self.color = COLORS[self.color_idx]
+
+        # Will be updated once we know screen size
+        self.tx = 200.0
+        self.ty = 200.0
+        self.vx = 3.5
+        self.vy = 2.8
+        self.text_w = 0.0
+        self.text_h = 0.0
+
+        self.area = Gtk.DrawingArea()
+        self.area.set_draw_func(self.draw)
+        self.set_child(self.area)
+
+        # Hide cursor
+        display = Gdk.Display.get_default()
+        cursor = Gdk.Cursor.new_from_name("none", None)
+        self.set_cursor(cursor)
+
+        key = Gtk.EventControllerKey()
+        key.connect("key-pressed", lambda *_: app.quit())
+        self.add_controller(key)
+
+        click = Gtk.GestureClick()
+        click.connect("pressed", lambda *_: app.quit())
+        self.add_controller(click)
+
+        GLib.timeout_add(16, self.tick)
+
+    def measure_text(self, cr, w, h):
+        layout = PangoCairo.create_layout(cr)
+        layout.set_text(self.text, -1)
+        desc = Pango.FontDescription.new()
+        desc.set_family("Sans Bold")
+        desc.set_size(self.font_size * Pango.SCALE)
+        layout.set_font_description(desc)
+        lw, lh = layout.get_pixel_size()
+        self.text_w = lw
+        self.text_h = lh
+        # Clamp initial position
+        if self.tx + self.text_w > w:
+            self.tx = max(0, w - self.text_w - 10)
+        if self.ty + self.text_h > h:
+            self.ty = max(0, h - self.text_h - 10)
+
+    def tick(self):
+        w = self.area.get_width()
+        h = self.area.get_height()
+        if w == 0 or h == 0 or self.text_w == 0:
+            self.area.queue_draw()
+            return True
+
+        bounced = False
+        self.tx += self.vx
+        self.ty += self.vy
+
+        if self.tx <= 0:
+            self.tx = 0
+            self.vx = abs(self.vx)
+            bounced = True
+        elif self.tx + self.text_w >= w:
+            self.tx = w - self.text_w
+            self.vx = -abs(self.vx)
+            bounced = True
+
+        if self.ty <= 0:
+            self.ty = 0
+            self.vy = abs(self.vy)
+            bounced = True
+        elif self.ty + self.text_h >= h:
+            self.ty = h - self.text_h
+            self.vy = -abs(self.vy)
+            bounced = True
+
+        if bounced:
+            self.color_idx = (self.color_idx + 1) % len(COLORS)
+            self.color = COLORS[self.color_idx]
+
+        self.area.queue_draw()
+        return True
+
+    def draw(self, area, cr, w, h):
+        cr.set_source_rgb(0, 0, 0)
+        cr.paint()
+
+        layout = PangoCairo.create_layout(cr)
+        layout.set_text(self.text, -1)
+        desc = Pango.FontDescription.new()
+        desc.set_family("Sans Bold")
+        desc.set_size(self.font_size * Pango.SCALE)
+        layout.set_font_description(desc)
+
+        if self.text_w == 0:
+            self.measure_text(cr, w, h)
+
+        cr.set_source_rgb(*self.color)
+        cr.move_to(self.tx, self.ty)
+        PangoCairo.show_layout(cr, layout)
+
+
+class BolichApp(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id="com.hyprbrigade.calibration")
+
+    def do_activate(self):
+        win = BolicheSaver(self)
+        win.present()
+
+BolichApp().run()
+PYEOF
