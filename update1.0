@@ -72,12 +72,14 @@ class BolicheSaver(Gtk.ApplicationWindow):
         self.set_cursor(cursor)
 
         key = Gtk.EventControllerKey()
-        key.connect("key-pressed", lambda *_: app.quit())
+        key.connect("key-pressed", self.on_key)
         self.add_controller(key)
 
-        click = Gtk.GestureClick()
-        click.connect("pressed", lambda *_: app.quit())
-        self.add_controller(click)
+    def on_key(self, controller, keyval, keycode, state):
+        ctrl = bool(state & Gdk.ModifierType.CONTROL_MASK)
+        q = keyval in (Gdk.KEY_q, Gdk.KEY_Q)
+        if ctrl and q:
+            self.get_application().quit()
 
         GLib.timeout_add(16, self.tick)
 
